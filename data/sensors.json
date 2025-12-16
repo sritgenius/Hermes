@@ -1,0 +1,39 @@
+{
+  "sensors": [
+    {
+      "id": 1,
+      "name": "СОР-001",
+      "type": "pressure",
+      "zone": "A1",
+      "status": "normal",
+      "value": 3.2,
+      "unit": "Бар",
+      "thresholds": {
+        "warning": 3.8,
+        "danger": 4.5
+      },
+      "lastUpdate": "2024-01-15T14:30:00Z"
+    },
+    {
+      "id": 2,
+      "name": "СОР-002",
+      "type": "leak",
+      "zone": "A2",
+      "status": "warning",
+      "value": 0.8,
+      "unit": "л/мин",
+      "thresholds": {
+        "warning": 0.7,
+        "danger": 1.5
+      },
+      "lastUpdate": "2024-01-15T14:29:45Z"
+    }
+  ],
+  "system": {
+    "name": "ГЕРМЕС СОР",
+    "version": "2.1.4",
+    "uptime": "99.8%",
+    "lastMaintenance": "2024-01-10",
+    "nextMaintenance": "2024-02-10"
+  }
+}

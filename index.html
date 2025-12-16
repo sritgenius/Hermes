@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ГЕРМЕС - Система Обнаружения Разгерметизации</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+</head>
+<body class="system-bg">
+    <!-- Экран загрузки -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader-container">
+            <div class="circular-loader"></div>
+            <div class="loader-text">Инициализация системы ГЕРМЕС...</div>
+            <div class="loader-progress">
+                <div class="progress-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Основной контейнер -->
+    <div class="main-container" id="mainContainer" style="display: none;">
+        <!-- Шапка системы -->
+        <header class="system-header">
+            <div class="header-left">
+                <div class="system-logo">
+                    <i class="fas fa-shield-alt logo-icon"></i>
+                    <h1 class="system-title">ГЕРМЕС</h1>
+                    <span class="system-subtitle">Программно-аппаратный комплекс СОР</span>
+                </div>
+                <div class="system-status">
+                    <div class="status-indicator active"></div>
+                    <span>Система активна</span>
+                </div>
+            </div>
+            
+            <div class="header-center">
+                <div class="current-time" id="currentTime">--:--:--</div>
+                <div class="current-date" id="currentDate">--.--.----</div>
+            </div>
+            
+            <div class="header-right">
+                <div class="user-panel">
+                    <div class="user-avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="user-info">
+                        <span class="user-name" id="userName">Оператор</span>
+                        <span class="user-role" id="userRole">Главный оператор</span>
+                    </div>
+                    <button class="btn-logout" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+<!-- Панель быстрого доступа -->
+<nav class="quick-access">
+    <div class="access-grid">
+        <a href="index.html" class="access-item active">
+            <i class="fas fa-fire"></i>
+            <span>Панель управления</span>
+            <span class="badge danger" id="alarmCount">0</span>
+        </a>
+        <a href="event-log.html" class="access-item">
+            <i class="fas fa-clipboard-list"></i>
+            <span>Журнал событий</span>
+            <span class="badge warning" id="eventCount">0</span>
+        </a>
+        <a href="sensors.html" class="access-item">
+            <i class="fas fa-microchip"></i>
+            <span>Датчики</span>
+            <span class="badge success" id="sensorCount">24</span>
+        </a>
+        <a href="analytics.html" class="access-item">
+            <i class="fas fa-chart-line"></i>
+            <span>Аналитика</span>
+        </a>
+        <a href="report.html" class="access-item">
+            <i class="fas fa-file-alt"></i>
+            <span>Отчеты</span>
+        </a>
+        <a href="settings.html" class="access-item">
+            <i class="fas fa-cogs"></i>
+            <span>Настройки</span>
+        </a>
+    </div>
+</nav>
+
+        <!-- Основной контент -->
+        <main class="main-content">
+            <section class="welcome-section">
+                <div class="welcome-card">
+                    <h2><i class="fas fa-bolt"></i> Система ГЕРМЕС в действии</h2>
+                    <p>Мониторинг и управление системой обнаружения разгерметизации в реальном времени</p>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon normal">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="normalCount">18</h3>
+                                <p>Датчиков в норме</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="warningCount">3</h3>
+                                <p>Предупреждений</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon danger">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="dangerCount">1</h3>
+                                <p>Критических инцидентов</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon info">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="uptimeCount">99.8%</h3>
+                                <p>Аптайм системы</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="content-grid">
+                <!-- Левая колонка -->
+                <div class="content-column">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-history"></i> Последние события</h3>
+                            <button class="btn-view-all">Показать все</button>
+                        </div>
+                        <div class="card-body">
+                            <div class="events-list" id="recentEvents">
+                                <!-- События будут загружены через JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-map-marked-alt"></i> Схема объекта</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="object-map">
+                                <div class="map-container">
+                                    <!-- Упрощенная схема объекта -->
+                                    <div class="map-grid">
+                                        <div class="zone" data-zone="A1">
+                                            <div class="zone-label">Зона A1</div>
+                                            <div class="sensor normal" data-sensor="101"><i class="fas fa-circle"></i></div>
+                                        </div>
+                                        <div class="zone" data-zone="A2">
+                                            <div class="zone-label">Зона A2</div>
+                                            <div class="sensor warning" data-sensor="102"><i class="fas fa-circle"></i></div>
+                                        </div>
+                                        <div class="zone" data-zone="B1">
+                                            <div class="zone-label">Зона B1</div>
+                                            <div class="sensor danger" data-sensor="103"><i class="fas fa-circle"></i></div>
+                                        </div>
+                                        <div class="zone" data-zone="B2">
+                                            <div class="zone-label">Зона B2</div>
+                                            <div class="sensor normal" data-sensor="104"><i class="fas fa-circle"></i></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Правая колонка -->
+                <div class="content-column">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-chart-bar"></i> Статистика за сутки</h3>
+                            <div class="time-selector">
+                                <select id="timeRange">
+                                    <option value="24h">24 часа</option>
+                                    <option value="12h">12 часов</option>
+                                    <option value="6h">6 часов</option>
+                                    <option value="1h">1 час</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="dailyChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+    <div class="card">
+    <div class="card-header">
+        <h3><i class="fas fa-tachometer-alt"></i> Быстрые действия</h3>
+    </div>
+ <div class="card-body">
+    <div class="quick-actions">
+        <!-- Управление звуком -->
+        <div class="sound-controls">
+            <button class="btn-action danger" id="silenceAlarm">
+                <div class="icon-container">
+                    <i class="fas fa-volume-mute"></i>
+                </div>
+                <span>Тишина</span>
+            </button>
+            <button class="btn-action success" id="enableSound" style="display: none;">
+                <div class="icon-container">
+                    <i class="fas fa-volume-up"></i>
+                </div>
+                <span>Включить звук</span>
+            </button>
+        </div>
+        
+        <!-- Основные кнопки -->
+        <button class="btn-action warning" id="acknowledgeAll">
+            <div class="icon-container">
+                <i class="fas fa-check-double"></i>
+            </div>
+            <span>Подтвердить все</span>
+        </button>
+        
+        <button class="btn-action info" id="notifyTeam">
+            <div class="icon-container">
+                <i class="fas fa-bell"></i>
+            </div>
+            <span>Уведомить смену</span>
+        </button>
+        
+        <button class="btn-action success" id="generateReport">
+            <div class="icon-container">
+                <i class="fas fa-file-export"></i>
+            </div>
+            <span>Отчет</span>
+        </button>
+        
+        <!-- Кнопка администратора -->
+        <button class="btn-action admin" id="adminTestSensor" style="display: none;">
+            <div class="icon-container">
+                <i class="fas fa-vial"></i>
+            </div>
+            <span>Тест датчика</span>
+        </button>
+    </div>
+</div>
+</div>
+        </main>
+
+        <!-- Футер -->
+        <footer class="system-footer">
+            <div class="footer-left">
+                <span>© 2025 ГЕРМЕС СОР v1.0.0</span>
+                <span class="footer-separator">|</span>
+                <span>Последнее обновление: <span id="lastUpdate">--:--</span></span>
+            </div>
+            <div class="footer-right">
+                <span>Статус соединения: </span>
+                <div class="connection-status connected">
+                    <div class="status-dot"></div>
+                    <span>ONLINE</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Модальное окно авторизации -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-shield"></i> Авторизация оператора</h3>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="username"><i class="fas fa-user"></i> Имя пользователя</label>
+                        <input type="text" id="username" placeholder="Введите логин" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password"><i class="fas fa-lock"></i> Пароль</label>
+                        <input type="password" id="password" placeholder="Введите пароль" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="role"><i class="fas fa-id-card"></i> Роль</label>
+                        <select id="role" required>
+                            <option value="">Выберите роль</option>
+                            <option value="operator">Оператор</option>
+                            <option value="engineer">Инженер</option>
+                            <option value="admin">Администратор</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-sign-in-alt"></i> Войти в систему
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Скрипты -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/simulator.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/utils/dataGenerator.js"></script>
+    <script src="js/utils/notifications.js"></script>
+<!-- Модальное окно тестирования датчика -->
+<div class="modal" id="testSensorModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-vial"></i> Тестирование датчика</h3>
+            <button class="modal-close" id="closeTestModal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="sensorSelect"><i class="fas fa-microchip"></i> Выберите датчик</label>
+                <select id="sensorSelect" class="sensor-select">
+                    <!-- Опции будут заполнены через JS -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="testType"><i class="fas fa-bolt"></i> Тип теста</label>
+                <select id="testType" class="test-type">
+                    <option value="normal">Нормальный режим</option>
+                    <option value="warning">Предупреждение</option>
+                    <option value="danger">Авария</option>
+                    <option value="failure">Отказ датчика</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="testDuration"><i class="fas fa-clock"></i> Длительность (сек)</label>
+                <input type="number" id="testDuration" min="5" max="300" value="30" class="test-duration">
+            </div>
+            <div class="test-buttons">
+                <button class="btn-test" id="runTest">
+                    <i class="fas fa-play"></i> Запустить тест
+                </button>
+                <button class="btn-test cancel" id="cancelTest">
+                    <i class="fas fa-stop"></i> Отменить
+                </button>
+            </div>
+            <div class="test-status" id="testStatus">
+                <div class="status-icon">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="status-text">Готов к тестированию</div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
